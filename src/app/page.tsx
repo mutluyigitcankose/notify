@@ -6,7 +6,7 @@ import { EventCategoryTabs } from "@/components/events/event-category-tabs";
 import { DailyDigest } from "@/components/home/daily-digest";
 import { DateNavigator } from "@/components/home/date-navigator";
 import { FavoriteDates } from "@/components/home/favorite-dates";
-import { ShareDateCard } from "@/components/home/share-date-card";
+import { ReadingPaths } from "@/components/home/reading-paths";
 import { PushPermissionBanner } from "@/components/notifications/push-permission-banner";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -51,6 +51,12 @@ export default async function HomePage() {
       <PushPermissionBanner />
 
       <DailyDigest payload={data} />
+      <FavoriteDates
+        month={month}
+        day={day}
+        label={formatTurkishDate(today, "d MMMM")}
+      />
+      <ReadingPaths payload={data} />
 
       <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">
@@ -73,18 +79,7 @@ export default async function HomePage() {
         <EventCategoryTabs groups={data.groups} />
       </section>
 
-      <EventSearchPanel payload={data} />
-
-      <FavoriteDates
-        month={month}
-        day={day}
-        label={formatTurkishDate(today, "d MMMM")}
-      />
-      <ShareDateCard
-        month={month}
-        day={day}
-        label={formatTurkishDate(today, "d MMMM")}
-      />
+      <EventSearchPanel payload={data} compact />
     </>
   );
 }

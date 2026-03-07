@@ -24,6 +24,9 @@ export function Header() {
             <Link href="/kesfet">Keşfet</Link>
           </Button>
           <Button variant="ghost" asChild>
+            <Link href="/giris">Giriş</Link>
+          </Button>
+          <Button variant="ghost" asChild>
             <Link href="/settings">Ayarlar</Link>
           </Button>
           <ThemeToggle />

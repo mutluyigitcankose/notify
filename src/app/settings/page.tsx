@@ -1,6 +1,13 @@
+import { AccountSettings } from "@/components/settings/account-settings";
 import { NotificationSettings } from "@/components/notifications/notification-settings";
+import { ProfileSyncSettings } from "@/components/settings/profile-sync-settings";
 
 export default function SettingsPage() {
+  const googleEnabled = Boolean(
+    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
+  );
+  const githubEnabled = Boolean(process.env.GITHUB_ID && process.env.GITHUB_SECRET);
+
   return (
     <section className="space-y-6">
       <div>
@@ -9,7 +16,9 @@ export default function SettingsPage() {
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Bildirim ve içerik tercihleri</h1>
       </div>
+      <AccountSettings googleEnabled={googleEnabled} githubEnabled={githubEnabled} />
       <NotificationSettings />
+      <ProfileSyncSettings />
     </section>
   );
 }

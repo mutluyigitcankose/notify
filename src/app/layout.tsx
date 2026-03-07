@@ -1,3 +1,4 @@
+import { AuthSessionProvider } from "@/components/auth-session-provider";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Playfair_Display, Space_Grotesk } from "next/font/google";
@@ -27,13 +28,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="tr" suppressHydrationWarning>
       <body className={`${sans.variable} ${serif.variable}`}>
         <ThemeProvider>
-          <div className="min-h-screen">
-            <Header />
-            <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <AuthSessionProvider>
+            <div className="min-h-screen">
+              <Header />
+              <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </AuthSessionProvider>
         </ThemeProvider>
       </body>
     </html>

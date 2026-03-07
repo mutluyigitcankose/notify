@@ -60,7 +60,6 @@ export function ExploreDateCard({
           <div className="flex w-fit items-center gap-1 rounded-full bg-black/5 dark:bg-white/5">
             <Button
               variant="ghost"
-              size="icon"
               className="h-8 w-8 shrink-0 rounded-full"
               onClick={() => goToDate(previous.month, previous.day)}
               disabled={loading}
@@ -76,7 +75,6 @@ export function ExploreDateCard({
             </span>
             <Button
               variant="ghost"
-              size="icon"
               className="h-8 w-8 shrink-0 rounded-full"
               onClick={() => goToDate(next.month, next.day)}
               disabled={loading}

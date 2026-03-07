@@ -1,7 +1,9 @@
+import crypto from "node:crypto";
 import {
   boolean,
   index,
   integer,
+  primaryKey,
   jsonb,
   pgTable,
   text,
@@ -99,7 +101,122 @@ export const notificationLog = pgTable(
   ],
 );
 
+export const userProfiles = pgTable(
+  "user_profiles",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    syncCode: text("sync_code").notNull().unique(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("user_profiles_sync_code_idx").on(table.syncCode),
+    index("user_profiles_last_seen_idx").on(table.lastSeenAt),
+  ],
+);
+
+export const favoriteDates = pgTable(
+  "favorite_dates",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    profileId: integer("profile_id")
+      .notNull()
+      .references(() => userProfiles.id, { onDelete: "cascade" }),
+    month: integer("month").notNull(),
+    day: integer("day").notNull(),
+    label: text("label").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("favorite_dates_profile_day_idx").on(
+      table.profileId,
+      table.month,
+      table.day,
+    ),
+    index("favorite_dates_profile_idx").on(table.profileId),
+  ],
+);
+
+export const users = pgTable("user", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name"),
+  email: text("email").unique(),
+  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  image: text("image"),
+});
+
+export const accounts = pgTable(
+  "account",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("providerAccountId").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (table) => [
+    primaryKey({ columns: [table.provider, table.providerAccountId] }),
+    index("account_user_idx").on(table.userId),
+  ],
+);
+
+export const sessions = pgTable(
+  "session",
+  {
+    sessionToken: text("sessionToken").primaryKey(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (table) => [index("session_user_idx").on(table.userId)],
+);
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.identifier, table.token] })],
+);
+
+export const userFavoriteDates = pgTable(
+  "user_favorite_dates",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    month: integer("month").notNull(),
+    day: integer("day").notNull(),
+    label: text("label").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("user_favorite_dates_user_day_idx").on(
+      table.userId,
+      table.month,
+      table.day,
+    ),
+    index("user_favorite_dates_user_idx").on(table.userId),
+  ],
+);
+
 export const insertEventsCacheSchema = createInsertSchema(eventsCache);
 export const selectEventsCacheSchema = createSelectSchema(eventsCache);
 export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions);
 export const insertUserSettingsSchema = createInsertSchema(userSettings);
+export const insertUserProfileSchema = createInsertSchema(userProfiles);
+export const insertFavoriteDateSchema = createInsertSchema(favoriteDates);
