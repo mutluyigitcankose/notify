@@ -9,16 +9,25 @@ export default function SettingsPage() {
   const githubEnabled = Boolean(process.env.GITHUB_ID && process.env.GITHUB_SECRET);
 
   return (
-    <section className="space-y-6">
-      <div>
+    <div className="flex flex-col gap-10">
+      <section>
         <p className="text-sm uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
           Ayarlar
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Bildirim ve içerik tercihleri</h1>
-      </div>
-      <AccountSettings googleEnabled={googleEnabled} githubEnabled={githubEnabled} />
-      <NotificationSettings />
-      <ProfileSyncSettings />
-    </section>
+      </section>
+
+      <section>
+        <AccountSettings googleEnabled={googleEnabled} githubEnabled={githubEnabled} />
+      </section>
+
+      <section>
+        <NotificationSettings />
+      </section>
+
+      <section>
+        <ProfileSyncSettings />
+      </section>
+    </div>
   );
 }

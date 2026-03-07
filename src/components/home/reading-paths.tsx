@@ -58,7 +58,7 @@ export function ReadingPaths({ payload }: { payload: DailyEventsPayload }) {
   const paths = buildPaths(payload);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <div>
         <div className="text-sm uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
           Okuma Rotaları
@@ -67,7 +67,7 @@ export function ReadingPaths({ payload }: { payload: DailyEventsPayload }) {
           Aynı güne farklı tempolarda gir
         </h3>
       </div>
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-5 lg:grid-cols-3">
         {paths.map((path) => (
           <Card key={path.title} className="flex h-full flex-col justify-between gap-5">
             <div>

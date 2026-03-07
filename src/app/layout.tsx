@@ -29,9 +29,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`${sans.variable} ${serif.variable}`}>
         <ThemeProvider>
           <AuthSessionProvider>
-            <div className="min-h-screen">
+            <div className="flex min-h-screen flex-col">
               <Header />
-              <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">
+              <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-4 py-8 sm:py-10">
                 {children}
               </main>
               <Footer />

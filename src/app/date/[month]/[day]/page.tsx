@@ -33,36 +33,56 @@ export default async function DatePage({ params }: PageProps) {
   const date = new Date(2026, parsed.month - 1, parsed.day);
 
   return (
-    <section className="space-y-6">
-      <Card>
-        <p className="text-sm text-[var(--muted-foreground)]">
-          <Link href="/" className="text-[var(--accent)]">
-            Ana Sayfa
-          </Link>{" "}
-          /{" "}
-          <Link href="/kesfet" className="text-[var(--accent)]">
-            Keşfet
-          </Link>{" "}
-          / Tarih / {formatTurkishDate(date, "d MMMM")}
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold">
-          {formatTurkishDate(date, "d MMMM")} tarihinde neler oldu?
-        </h1>
-      </Card>
-      <DateNavigator month={parsed.month} day={parsed.day} />
-      <DailyDigest payload={data} />
-      <EventCategoryTabs groups={data.groups} />
-      <EventSearchPanel payload={data} />
-      <FavoriteDates
-        month={parsed.month}
-        day={parsed.day}
-        label={formatTurkishDate(date, "d MMMM")}
-      />
-      <ShareDateCard
-        month={parsed.month}
-        day={parsed.day}
-        label={formatTurkishDate(date, "d MMMM")}
-      />
-    </section>
+    <div className="flex flex-col gap-10">
+      <section>
+        <Card>
+          <p className="text-sm text-[var(--muted-foreground)]">
+            <Link href="/" className="text-[var(--accent)]">
+              Ana Sayfa
+            </Link>{" "}
+            /{" "}
+            <Link href="/kesfet" className="text-[var(--accent)]">
+              Keşfet
+            </Link>{" "}
+            / Tarih / {formatTurkishDate(date, "d MMMM")}
+          </p>
+          <h1 className="mt-3 font-serif text-4xl font-semibold">
+            {formatTurkishDate(date, "d MMMM")} tarihinde neler oldu?
+          </h1>
+        </Card>
+      </section>
+
+      <section>
+        <DateNavigator month={parsed.month} day={parsed.day} />
+      </section>
+
+      <section>
+        <DailyDigest payload={data} />
+      </section>
+
+      <section>
+        <EventCategoryTabs groups={data.groups} />
+      </section>
+
+      <section>
+        <EventSearchPanel payload={data} />
+      </section>
+
+      <section>
+        <FavoriteDates
+          month={parsed.month}
+          day={parsed.day}
+          label={formatTurkishDate(date, "d MMMM")}
+        />
+      </section>
+
+      <section>
+        <ShareDateCard
+          month={parsed.month}
+          day={parsed.day}
+          label={formatTurkishDate(date, "d MMMM")}
+        />
+      </section>
+    </div>
   );
 }

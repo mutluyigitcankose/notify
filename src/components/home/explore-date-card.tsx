@@ -51,7 +51,7 @@ export function ExploreDateCard({
   }
 
   return (
-    <Card className="relative space-y-4" aria-busy={loading}>
+    <Card className="relative space-y-5" aria-busy={loading}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2">
           <div className="text-xs uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
@@ -118,13 +118,15 @@ export function ExploreDateCard({
           </div>
         ) : (
           <>
-            <div>
+            <div className="pt-1">
               <h2 className="text-2xl font-semibold">
                 {payload.featured?.year ? `${payload.featured.year}: ` : ""}
                 {payload.featured?.text ?? "Öne çıkan içerik yok"}
               </h2>
             </div>
-            <DailyDigest payload={payload} />
+            <div className="mt-4">
+              <DailyDigest payload={payload} />
+            </div>
           </>
         )}
       </div>

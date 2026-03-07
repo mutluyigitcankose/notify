@@ -12,8 +12,8 @@ export function EventCategoryTabs({ groups }: { groups: EventGroup[] }) {
   }
 
   return (
-    <Tabs defaultValue={defaultValue}>
-      <TabsList className="mb-5">
+    <Tabs defaultValue={defaultValue} className="w-full">
+      <TabsList className="mt-4 mb-5 p-2.5">
         {groups.map((group) => (
           <TabsTrigger key={group.category} value={group.category}>
             {group.label}

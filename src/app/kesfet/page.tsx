@@ -31,8 +31,8 @@ export default async function ExplorePage() {
   );
 
   return (
-    <section className="space-y-6">
-      <div>
+    <div className="flex flex-col gap-10">
+      <section>
         <Badge>Keşfet</Badge>
         <h1 className="mt-3 font-serif text-4xl font-semibold">
           Editoryal tarih rotaları
@@ -40,8 +40,9 @@ export default async function ExplorePage() {
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
           Sadece bugünü değil, komşu günleri ve sembolik tarihleri de hızlıca tarayın.
         </p>
-      </div>
-      <div className="grid gap-5 xl:grid-cols-2">
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-2">
         {cards.map((card) => (
           <ExploreDateCard
             key={`${card.month}-${card.day}`}
@@ -50,7 +51,7 @@ export default async function ExplorePage() {
             initialPayload={card.payload}
           />
         ))}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

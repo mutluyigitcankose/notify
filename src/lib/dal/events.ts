@@ -5,6 +5,23 @@ import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/utils/constants";
 import type { DailyEventsPayload } from "@/types/events";
 import type { WikimediaCategory, WikimediaResponse } from "@/types/wikimedia";
 
+/** API bazen tek harf veya anlamsız text döndürüyor (özellikle tatiller). Bunları göstermiyoruz. */
+const MIN_EVENT_TEXT_LENGTH = 2;
+
+function isMeaningfulText(text: string): boolean {
+  return text.trim().length >= MIN_EVENT_TEXT_LENGTH;
+}
+
+function filterMeaningful(raw: WikimediaResponse): WikimediaResponse {
+  return CATEGORY_ORDER.reduce(
+    (acc, category) => {
+      acc[category] = (raw[category] ?? []).filter((item) => isMeaningfulText(item.text));
+      return acc;
+    },
+    {} as WikimediaResponse,
+  );
+}
+
 function buildStats(raw: WikimediaResponse) {
   const years = CATEGORY_ORDER.flatMap((category) =>
     raw[category].flatMap((item) => (typeof item.year === "number" ? [item.year] : [])),
@@ -34,10 +51,12 @@ function buildHighlights(raw: WikimediaResponse) {
 }
 
 function toPayload(month: number, day: number, raw: WikimediaResponse): DailyEventsPayload {
+  const filtered = filterMeaningful(raw);
+
   const groups = CATEGORY_ORDER.map((category) => ({
     category,
     label: CATEGORY_LABELS[category],
-    items: raw[category] ?? [],
+    items: filtered[category] ?? [],
   }));
 
   return {
@@ -45,13 +64,13 @@ function toPayload(month: number, day: number, raw: WikimediaResponse): DailyEve
     day,
     groups,
     featured:
-      raw.selected[0] ??
-      raw.events[0] ??
-      raw.births[0] ??
-      raw.deaths[0] ??
-      raw.holidays[0],
-    stats: buildStats(raw),
-    highlights: buildHighlights(raw),
+      filtered.selected[0] ??
+      filtered.events[0] ??
+      filtered.births[0] ??
+      filtered.deaths[0] ??
+      filtered.holidays[0],
+    stats: buildStats(filtered),
+    highlights: buildHighlights(filtered),
   };
 }
 
