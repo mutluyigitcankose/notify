@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { getEventsForDate } from "@/lib/dal/events";
+import { apiError } from "@/lib/api/response";
 import { getClientIp, rateLimit } from "@/lib/security/rate-limit";
 import { dateParamsSchema } from "@/lib/security/validate";
 
@@ -11,29 +11,20 @@ export async function GET(
   const limited = rateLimit(`events:${ip}`, 30, 60_000);
 
   if (!limited.success) {
-    return NextResponse.json(
-      { error: "Çok fazla istek gönderildi." },
-      { status: 429 },
-    );
+    return apiError("Çok fazla istek gönderildi.", 429, "RATE_LIMIT");
   }
 
   const params = await context.params;
   const parsed = dateParamsSchema.safeParse(params);
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Geçersiz tarih parametresi." },
-      { status: 400 },
-    );
+    return apiError("Geçersiz tarih parametresi.", 400, "VALIDATION_ERROR", parsed.error.flatten());
   }
 
   try {
     const payload = await getEventsForDate(parsed.data.month, parsed.data.day);
-    return NextResponse.json(payload);
+    return Response.json(payload);
   } catch (error) {
-    return NextResponse.json(
-      { error: (error as Error).message },
-      { status: 500 },
-    );
+    return apiError((error as Error).message, 500, "INTERNAL_ERROR");
   }
 }

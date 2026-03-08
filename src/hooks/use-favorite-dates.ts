@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/toaster";
 import {
   FAVORITES_UPDATED_EVENT,
   isFavoriteDate,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/favorites/storage";
 
 export function useFavoriteDates() {
+  const toast = useToast();
   const [items, setItems] = useState<FavoriteDate[]>(() => readFavoriteDates());
   const [loading, setLoading] = useState(true);
   const [syncCode, setSyncCode] = useState<string | null>(null);
@@ -74,7 +76,9 @@ export function useFavoriteDates() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError((err as Error).message);
+          const msg = (err as Error).message;
+          setError(msg);
+          toast(msg, "error");
         }
       } finally {
         if (!cancelled) {
@@ -108,7 +112,9 @@ export function useFavoriteDates() {
         throw new Error(payload.error ?? "Favori senkronize edilemedi.");
       }
     } catch (err) {
-      setError((err as Error).message);
+      const msg = (err as Error).message;
+      setError(msg);
+      toast(msg, "error");
       setItems(items);
       writeFavoriteDates(items);
     }

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { apiError, sanitizeErrorMessage } from "@/lib/api/response";
 import {
   deleteSyncedFavorite,
   getSyncedFavorites,
   saveSyncedFavorite,
 } from "@/lib/profile/session";
 import { dateParamsSchema } from "@/lib/security/validate";
+
+const FAVORITES_ERROR = "Favoriler yüklenemedi. Lütfen sayfayı yenileyin.";
 
 const favoriteSchema = dateParamsSchema.extend({
   label: z.string().trim().min(1).max(120),
@@ -39,7 +42,8 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    const message = sanitizeErrorMessage(error, FAVORITES_ERROR);
+    return apiError(message, 500, "INTERNAL_ERROR");
   }
 }
 
@@ -64,7 +68,8 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    const message = sanitizeErrorMessage(error, "Favori kaydedilemedi.");
+    return apiError(message, 500, "INTERNAL_ERROR");
   }
 }
 
@@ -80,6 +85,7 @@ export async function DELETE(request: Request) {
     await deleteSyncedFavorite(parsed.data.month, parsed.data.day);
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    const message = sanitizeErrorMessage(error, "Favori silinemedi.");
+    return apiError(message, 500, "INTERNAL_ERROR");
   }
 }

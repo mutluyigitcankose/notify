@@ -84,12 +84,22 @@ export async function getSyncedFavorites() {
   const session = await getAuthSession();
 
   if (session?.user?.id) {
-    await migrateProfileFavoritesToUser(session.user.id);
-    return {
-      accountType: "user" as const,
-      user: session.user,
-      favorites: await listUserFavoriteDates(session.user.id),
-    };
+    try {
+      await migrateProfileFavoritesToUser(session.user.id);
+      const favorites = await listUserFavoriteDates(session.user.id);
+      return {
+        accountType: "user" as const,
+        user: session.user,
+        favorites,
+      };
+    } catch {
+      // Giriş yapmış kullanıcı için DB hatasında boş liste; sayfa açılsın
+      return {
+        accountType: "user" as const,
+        user: session.user,
+        favorites: [],
+      };
+    }
   }
 
   const profile = await ensureProfileSession();
