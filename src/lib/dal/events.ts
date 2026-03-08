@@ -90,21 +90,28 @@ function fromCache(
 
 export async function getEventsForDate(month: number, day: number) {
   if (isDatabaseConfigured()) {
-    const cached = await getFreshEventCache(month, day);
-
-    if (cached.length > 0) {
-      return fromCache(cached, month, day);
+    try {
+      const cached = await getFreshEventCache(month, day);
+      if (cached.length > 0) {
+        return fromCache(cached, month, day);
+      }
+    } catch {
+      // Veritabanı erişilemiyorsa veya tablo yoksa API'den çekmeye devam et
     }
   }
 
   const fresh = await fetchWikimediaEvents(month, day);
 
   if (isDatabaseConfigured()) {
-    const entries = Object.entries(fresh).map(([category, data]) => ({
-      category,
-      data,
-    }));
-    await upsertEventCache(month, day, entries);
+    try {
+      const entries = Object.entries(fresh).map(([category, data]) => ({
+        category,
+        data,
+      }));
+      await upsertEventCache(month, day, entries);
+    } catch {
+      // Cache yazma başarısız olsa da veriyi döndür
+    }
   }
 
   return toPayload(month, day, fresh);
