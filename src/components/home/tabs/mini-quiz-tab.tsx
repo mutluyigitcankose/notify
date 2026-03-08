@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,32 +11,46 @@ function getEventsWithYear(payload: DailyEventsPayload): WikimediaEvent[] {
   return payload.groups.flatMap((g) => g.items).filter((e) => typeof e.year === "number");
 }
 
+function buildOptions(event: WikimediaEvent, allEvents: WikimediaEvent[]): number[] {
+  const wrongOptions =
+    allEvents.length >= 4
+      ? allEvents
+          .filter((e) => e !== event && e.year != null)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3)
+          .map((e) => e.year!)
+      : event.year != null
+        ? [event.year - 10, event.year + 5, event.year - 50].filter((y) => y > 0)
+        : [];
+
+  return [event.year!, ...wrongOptions].sort(() => Math.random() - 0.5);
+}
+
 export function MiniQuizTab({ payload }: { payload: DailyEventsPayload }) {
   const events = getEventsWithYear(payload);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [score, setScore] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const event = events[currentIndex];
-  const wrongOptions =
-    event && events.length >= 4
-      ? events
-          .filter((e) => e !== event && e.year != null)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-          .map((e) => e.year!)
-      : event?.year != null
-        ? [event.year - 10, event.year + 5, event.year - 50].filter((y) => y > 0)
-        : [];
 
-  const options = event
-    ? [event.year!, ...wrongOptions].sort(() => Math.random() - 0.5)
-    : [];
+  // Stable options for the current question — only recalculate when the question changes
+  const options = useMemo(
+    () => (event ? buildOptions(event, events) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentIndex, events.length],
+  );
 
   function handleAnswer(year: number) {
     if (showResult) return;
     setAnswer(year);
     setShowResult(true);
+    setTotal((t) => t + 1);
+    if (year === event?.year) {
+      setScore((s) => s + 1);
+    }
   }
 
   function nextQuestion() {
@@ -64,6 +78,14 @@ export function MiniQuizTab({ payload }: { payload: DailyEventsPayload }) {
         <h2 className="mt-2 font-serif text-3xl font-semibold">Bu olay hangi yıl?</h2>
       </div>
       <Card className="space-y-6 rounded-[28px] p-6">
+        {total > 0 && (
+          <div className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
+            <Check className="h-4 w-4 text-green-600" />
+            <span>
+              {score}/{total} doğru
+            </span>
+          </div>
+        )}
         <p className="text-lg leading-8">{event?.text}</p>
         <div className="grid grid-cols-2 gap-3">
           {options.map((year) => {
